@@ -1,0 +1,351 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Find Your Liam</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+*{box-sizing:border-box}
+body{
+ margin:0;background:#101522;color:#fff;
+ font-family:'Press Start 2P',monospace;
+ text-align:center;overflow-x:hidden
+}
+#game{
+ width:100%;max-width:900px;margin:auto;padding:16px
+}
+h1{font-size:clamp(19px,4vw,30px);color:#f5c9df;line-height:1.8}
+.sub{font-size:9px;color:#a9b5d1;line-height:2.2}
+canvas{
+ width:100%;max-width:720px;
+ aspect-ratio:16/10;background:#263b48;
+ border:5px solid #f2c9dd;border-radius:8px;
+ image-rendering:pixelated;display:block;margin:20px auto
+}
+.info{
+ display:flex;justify-content:space-between;gap:8px;
+ flex-wrap:wrap;font-size:10px;color:#f5d5e5;
+ line-height:2.3
+}
+button{
+ background:#edb9d2;color:#251b2b;border:0;
+ padding:14px 17px;font-family:inherit;
+ font-size:10px;border-radius:6px;cursor:pointer;
+ margin:5px
+}
+button:active{transform:scale(.96)}
+#controls{
+ display:grid;grid-template-columns:repeat(3,58px);
+ grid-template-rows:repeat(2,52px);
+ gap:6px;justify-content:center;margin:15px auto
+}
+#controls button{padding:8px;margin:0;font-size:17px}
+#modal{
+ display:none;position:fixed;inset:0;
+ background:#080c17eF;z-index:5;
+ align-items:center;justify-content:center;padding:20px
+}
+.paper{
+ background:#f5e4d7;color:#392b3b;
+ padding:25px 20px;border:5px solid #d6a8c1;
+ border-radius:8px;width:100%;max-width:480px;
+ line-height:2.5
+}
+.paper h2{font-size:15px;color:#a34e78}
+.paper p{
+ font-family:Arial,sans-serif;font-size:18px;
+ line-height:2;text-align:center;direction:rtl
+}
+#modal button{margin-top:15px}
+#startScreen{
+ position:fixed;inset:0;background:#111a2c;
+ display:flex;align-items:center;justify-content:center;
+ z-index:10;padding:20px
+}
+.startbox{max-width:550px;line-height:2.5}
+#ending{display:none}
+@media(max-width:500px){
+ .info{font-size:8px}
+ canvas{margin:12px auto}
+}
+</style>
+</head>
+<body>
+
+<div id="startScreen">
+ <div class="startbox">
+  <div style="font-size:48px">🌙</div>
+  <h1>FIND YOUR LIAM</h1>
+  <div class="sub">A JOURNEY MADE JUST FOR YOU</div>
+  <p style="font-size:10px;line-height:2.5;color:#d6c6df">
+   Five little worlds.<br>
+   One person worth finding.
+  </p>
+  <button onclick="startGame()">START JOURNEY</button>
+ </div>
+</div>
+
+<div id="game">
+ <h1>FIND YOUR LIAM</h1>
+ <div class="info">
+  <span id="stageName">THE BEGINNING</span>
+  <span id="stars">STARS: 0 / 3</span>
+ </div>
+
+ <canvas id="screen" width="640" height="400"></canvas>
+
+ <div class="sub" id="hint">
+  COLLECT 3 STARS AND FIND THE DOOR
+ </div>
+
+ <div id="controls">
+  <span></span>
+  <button onpointerdown="move(0,-1)">▲</button>
+  <span></span>
+  <button onpointerdown="move(-1,0)">◀</button>
+  <button onpointerdown="move(0,1)">▼</button>
+  <button onpointerdown="move(1,0)">▶</button>
+ </div>
+
+ <div class="sub">USE ARROW KEYS OR WASD TOO</div>
+ <div id="ending">
+  <h2 style="color:#f5c9df">YOU FOUND YOUR LIAM</h2>
+ </div>
+</div>
+
+<div id="modal">
+ <div class="paper">
+  <div style="font-size:30px">✉</div>
+  <h2 id="letterTitle">A LITTLE MESSAGE</h2>
+  <p id="letterText"></p>
+  <button onclick="nextStage()">CONTINUE ♥</button>
+ </div>
+</div>
+
+<script>
+const canvas=document.getElementById("screen");
+const ctx=canvas.getContext("2d");
+ctx.imageSmoothingEnabled=false;
+
+const stages=[
+ {
+  name:"THE BEGINNING",
+  bg:"#253d45",ground:"#45645b",decor:"#79947a",
+  title:"THE BEGINNING",
+  text:"یادته از کجا شروع شدیم؟ شاید اون موقع هیچ‌کدوممون نمی‌دونستیم قراره این‌قدر برای هم مهم بشیم. ولی حالا تو یکی از قشنگ‌ترین قسمت‌های زندگی منی."
+ },
+ {
+  name:"EVEN FROM AFAR",
+  bg:"#26334e",ground:"#394c6d",decor:"#8195b8",
+  title:"EVEN FROM AFAR",
+  text:"حتی وقتی فاصله بینمونه، یه جوری توی فکرمی که انگار همین نزدیکی. فاصله هیچ‌وقت باعث نشده کمتر بخوامت."
+ },
+ {
+  name:"THE LITTLE THINGS",
+  bg:"#4a354b",ground:"#76536b",decor:"#d29ab5",
+  title:"THE LITTLE THINGS",
+  text:"می‌دونی؟ بعضی از چیزای کوچیکت برای من خیلی بزرگن. صدات، اخلاق خاصت، اون سرد بودنای گاه‌به‌گاهت و حتی همون چیزایی که شاید خودت حواست بهشون نباشه."
+ },
+ {
+  name:"ALL THE UNSAID",
+  bg:"#282744",ground:"#51446b",decor:"#a99acb",
+  title:"ALL THE UNSAID",
+  text:"همه چیزایی که همیشه به زبون نمیارم، به این معنی نیست که حسشون نمی‌کنم. خیلی حرفا توی دلمه که شاید نتونم درست بیانشون کنم، ولی توی وجودم جا دارن."
+ },
+ {
+  name:"I FOUND YOU",
+  bg:"#25364d",ground:"#45647b",decor:"#f4c8df",
+  title:"I FOUND YOU",
+  text:"و بالاخره رسیدیم به اینجا. بین تمام مسیرها و اتفاقا، انتخاب من هنوز هم تویی. این بازی فقط یه بهونه بود که بهت بگم چقدر بودنت برام ارزش داره. ماهگردمون مبارک، یورام. ♥"
+ }
+];
+
+let level=0;
+let player={x:70,y:70};
+let stars=[];
+let collected=0;
+let door={x:570,y:320};
+let paused=false;
+let ended=false;
+
+function makeStars(){
+ stars=[
+  {x:190,y:100,got:false},
+  {x:430,y:90,got:false},
+  {x:320,y:285,got:false}
+ ];
+ collected=0;
+ player={x:70,y:70};
+ paused=false;
+ document.getElementById("stars").innerText="STARS: 0 / 3";
+ document.getElementById("stageName").innerText=stages[level].name;
+ document.getElementById("hint").innerText=
+ "COLLECT 3 STARS AND FIND THE DOOR";
+}
+
+function startGame(){
+ document.getElementById("startScreen").style.display="none";
+ makeStars();
+ draw();
+}
+
+function rect(x,y,w,h,color){
+ ctx.fillStyle=color;
+ ctx.fillRect(x,y,w,h);
+}
+
+function drawCharacter(x,y,isLiam=false){
+ // Pixel-art character base
+ const hair=isLiam?"#241a28":"#171820";
+ const clothes=isLiam?"#e8d4bf":"#17171c";
+ // shadow
+ rect(x-10,y+17,22,5,"#17202a");
+ // legs
+ rect(x-7,y+9,5,10,"#292535");
+ rect(x+3,y+9,5,10,"#292535");
+ // body
+ rect(x-10,y-5,21,16,clothes);
+ // arms
+ rect(x-14,y-3,5,13,clothes);
+ rect(x+10,y-3,5,13,clothes);
+ // face
+ rect(x-9,y-22,19,18,"#edc4a9");
+ // hair
+ rect(x-11,y-25,23,8,hair);
+ rect(x-12,y-20,5,12,hair);
+ rect(x+7,y-20,5,9,hair);
+ if(isLiam){
+  // long wavy hair
+  rect(x-13,y-19,4,22,hair);
+  rect(x+10,y-18,4,20,hair);
+  rect(x-10,y-27,19,4,hair);
+  // hair clips
+  rect(x+5,y-25,5,3,"#e8a6ca");
+ }else{
+  // short hair and glasses
+  rect(x-13,y-19,5,10,hair);
+  rect(x+9,y-19,5,9,hair);
+  rect(x-10,y-28,20,5,hair);
+  // glasses
+  rect(x-8,y-16,7,5,"#25232d");
+  rect(x+2,y-16,7,5,"#25232d");
+  rect(x-1,y-14,4,2,"#25232d");
+ }
+ // eyes
+ rect(x-5,y-15,2,2,"#28202b");
+ rect(x+4,y-15,2,2,"#28202b");
+}
+
+function draw(){
+ if(ended)return;
+ const s=stages[level];
+ rect(0,0,640,400,s.bg);
+ rect(20,20,600,360,s.ground);
+
+ // pixel landscape decorations
+ for(let i=0;i<18;i++){
+  let x=(i*83+25)%610+10;
+  let y=(i*57+35)%360+20;
+  rect(x,y,12,12,s.decor);
+  rect(x+4,y+12,4,8,"#263d3b");
+ }
+ // path
+ rect(45,45,550,310,"#ffffff0b");
+ rect(45,45,550,3,"#ffffff18");
+ rect(45,352,550,3,"#ffffff18");
+
+ // stars
+ stars.forEach(st=>{
+  if(!st.got){
+   ctx.fillStyle="#ffe89a";
+   ctx.font="25px serif";
+   ctx.fillText("★",st.x-10,st.y+8);
+  }
+ });
+
+ // door
+ rect(door.x-15,door.y-24,30,42,collected===3?"#f2b7d2":"#27303f");
+ rect(door.x-10,door.y-19,20,37,collected===3?"#f6d5e5":"#485366");
+ rect(door.x+5,door.y-2,3,3,"#ffe49a");
+
+ drawCharacter(player.x,player.y,false);
+ if(level===4){
+  drawCharacter(570,250,true);
+ }
+
+ requestAnimationFrame(draw);
+}
+
+function move(dx,dy){
+ if(paused||ended)return;
+ let nx=player.x+dx*12;
+ let ny=player.y+dy*12;
+ player.x=Math.max(35,Math.min(605,nx));
+ player.y=Math.max(45,Math.min(350,ny));
+
+ stars.forEach(st=>{
+  if(!st.got && Math.abs(player.x-st.x)<20 &&
+     Math.abs(player.y-st.y)<20){
+   st.got=true;
+   collected++;
+   document.getElementById("stars").innerText=
+    "STARS: "+collected+" / 3";
+  }
+ });
+
+ if(collected===3 &&
+    Math.abs(player.x-door.x)<28 &&
+    Math.abs(player.y-door.y)<28){
+   openLetter();
+ }
+}
+
+document.addEventListener("keydown",e=>{
+ const k=e.key.toLowerCase();
+ if(k==="arrowup"||k==="w")move(0,-1);
+ if(k==="arrowdown"||k==="s")move(0,1);
+ if(k==="arrowleft"||k==="a")move(-1,0);
+ if(k==="arrowright"||k==="d")move(1,0);
+});
+
+function openLetter(){
+ paused=true;
+ document.getElementById("letterTitle").innerText=stages[level].title;
+ document.getElementById("letterText").innerText=stages[level].text;
+ document.getElementById("modal").style.display="flex";
+}
+
+function nextStage(){
+ document.getElementById("modal").style.display="none";
+ if(level<4){
+  level++;
+  makeStars();
+ }else{
+  ended=true;
+  document.getElementById("ending").style.display="block";
+  document.getElementById("hint").innerText="THE END ♥";
+  document.getElementById("controls").style.display="none";
+  document.getElementById("stageName").innerText="TOGETHER";
+  drawEnding();
+ }
+}
+
+function drawEnding(){
+ rect(0,0,640,400,"#19243c");
+ for(let i=0;i<70;i++){
+  let x=(i*97)%640;
+  let y=(i*53)%400;
+  rect(x,y,3,3,"#ffe8b0");
+ }
+ drawCharacter(285,230,false);
+ drawCharacter(355,230,true);
+ ctx.fillStyle="#f6cce1";
+ ctx.font="22px serif";
+ ctx.fillText("♥",310,170);
+}
+</script>
+</body>
+</html>
