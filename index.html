@@ -3,349 +3,1059 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Find Your Liam</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>FIND ME</title>
+
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Playfair+Display:wght@500;600&display=swap');
 
 *{box-sizing:border-box}
+
 body{
- margin:0;background:#101522;color:#fff;
- font-family:'Press Start 2P',monospace;
- text-align:center;overflow-x:hidden
+ margin:0;
+ overflow:hidden;
+ background:#171523;
+ color:#fff;
+ font-family:'Cormorant Garamond',serif;
+ touch-action:none;
 }
+
 #game{
- width:100%;max-width:900px;margin:auto;padding:16px
+ position:fixed;
+ inset:0;
 }
-h1{font-size:clamp(19px,4vw,30px);color:#f5c9df;line-height:1.8}
-.sub{font-size:9px;color:#a9b5d1;line-height:2.2}
+
 canvas{
- width:100%;max-width:720px;
- aspect-ratio:16/10;background:#263b48;
- border:5px solid #f2c9dd;border-radius:8px;
- image-rendering:pixelated;display:block;margin:20px auto
+ display:block;
+ width:100%;
+ height:100%;
 }
-.info{
- display:flex;justify-content:space-between;gap:8px;
- flex-wrap:wrap;font-size:10px;color:#f5d5e5;
- line-height:2.3
+
+#start{
+ position:fixed;
+ inset:0;
+ z-index:5;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ text-align:center;
+ padding:25px;
+ background:
+ radial-gradient(ellipse at center,#44334c99,transparent 65%),
+ linear-gradient(130deg,#171523,#342638,#171523);
 }
+
+.start-content{
+ width:min(550px,100%);
+}
+
+.small-title{
+ letter-spacing:7px;
+ font-size:12px;
+ color:#e8b9cc;
+}
+
+h1{
+ font-family:'Playfair Display',serif;
+ font-size:clamp(55px,12vw,90px);
+ letter-spacing:5px;
+ color:#f4d3df;
+ margin:18px 0 5px;
+ text-shadow:0 0 35px #e6a9c877;
+}
+
+.subtitle{
+ color:#e9c9d4;
+ font-size:19px;
+ letter-spacing:3px;
+ margin-bottom:40px;
+}
+
+.start-note{
+ color:#d2b9c9;
+ font-size:17px;
+ line-height:1.9;
+ margin-bottom:35px;
+}
+
 button{
- background:#edb9d2;color:#251b2b;border:0;
- padding:14px 17px;font-family:inherit;
- font-size:10px;border-radius:6px;cursor:pointer;
- margin:5px
+ cursor:pointer;
+ border:1px solid #f1c9d8;
+ background:#e9bfd0;
+ color:#302433;
+ padding:14px 30px;
+ border-radius:3px;
+ font-family:inherit;
+ font-size:17px;
+ letter-spacing:2px;
 }
-button:active{transform:scale(.96)}
+
+button:active{
+ transform:scale(.96);
+}
+
+#startButton{
+ min-width:190px;
+ font-size:18px;
+}
+
+#hud{
+ position:fixed;
+ top:0;
+ left:0;
+ width:100%;
+ z-index:2;
+ padding:20px;
+ display:none;
+ pointer-events:none;
+ background:linear-gradient(#15121c99,transparent);
+}
+
+#stage{
+ font-family:'Playfair Display',serif;
+ font-size:23px;
+ color:#f4d3df;
+ letter-spacing:3px;
+}
+
+#objective{
+ margin-top:7px;
+ font-size:14px;
+ color:#f5e2e9;
+}
+
+#counter{
+ position:absolute;
+ right:20px;
+ top:24px;
+ font-size:14px;
+ color:#f6d8e4;
+}
+
 #controls{
- display:grid;grid-template-columns:repeat(3,58px);
- grid-template-rows:repeat(2,52px);
- gap:6px;justify-content:center;margin:15px auto
+ position:fixed;
+ z-index:3;
+ bottom:25px;
+ left:20px;
+ display:none;
+ gap:9px;
 }
-#controls button{padding:8px;margin:0;font-size:17px}
-#modal{
- display:none;position:fixed;inset:0;
- background:#080c17eF;z-index:5;
- align-items:center;justify-content:center;padding:20px
+
+#controls button{
+ width:57px;
+ height:57px;
+ padding:0;
+ border-radius:50%;
+ background:#34273dbb;
+ color:white;
+ border:1px solid #eac8d5aa;
+ font-size:22px;
+ touch-action:none;
 }
-.paper{
- background:#f5e4d7;color:#392b3b;
- padding:25px 20px;border:5px solid #d6a8c1;
- border-radius:8px;width:100%;max-width:480px;
- line-height:2.5
+
+#interact{
+ position:fixed;
+ right:22px;
+ bottom:35px;
+ z-index:3;
+ display:none;
+ width:75px;
+ height:75px;
+ border-radius:50%;
+ background:#e6b9ccdd;
+ color:#302433;
+ font-size:13px;
+ padding:5px;
 }
-.paper h2{font-size:15px;color:#a34e78}
-.paper p{
- font-family:Arial,sans-serif;font-size:18px;
- line-height:2;text-align:center;direction:rtl
+
+#dialogue{
+ display:none;
+ position:fixed;
+ inset:0;
+ z-index:8;
+ align-items:center;
+ justify-content:center;
+ padding:22px;
+ background:#100d19b9;
 }
-#modal button{margin-top:15px}
-#startScreen{
- position:fixed;inset:0;background:#111a2c;
- display:flex;align-items:center;justify-content:center;
- z-index:10;padding:20px
+
+.dialogue-box{
+ width:min(510px,100%);
+ padding:30px 25px;
+ background:linear-gradient(145deg,#f1d9df,#d9b9c9);
+ color:#382a38;
+ border:1px solid #fff0f5;
+ box-shadow:0 15px 60px #0008;
+ text-align:center;
 }
-.startbox{max-width:550px;line-height:2.5}
-#ending{display:none}
-@media(max-width:500px){
- .info{font-size:8px}
- canvas{margin:12px auto}
+
+.dialogue-box .chapter{
+ font-size:12px;
+ letter-spacing:4px;
+ color:#94677f;
+}
+
+.dialogue-box h2{
+ font-family:'Playfair Display',serif;
+ font-size:30px;
+ margin:15px 0;
+}
+
+.dialogue-box p{
+ font-size:21px;
+ line-height:2;
+ direction:rtl;
+ margin:20px 0 25px;
+}
+
+#musicLabel{
+ position:fixed;
+ right:18px;
+ top:90px;
+ color:#f0d6e2;
+ font-size:12px;
+ z-index:2;
+ display:none;
+}
+
+#ending{
+ display:none;
+ position:fixed;
+ inset:0;
+ z-index:9;
+ background:#171321ed;
+ align-items:center;
+ justify-content:center;
+ text-align:center;
+ padding:25px;
+}
+
+#ending h2{
+ font-family:'Playfair Display',serif;
+ color:#f5cbdc;
+ font-size:clamp(38px,9vw,65px);
+}
+
+#ending p{
+ font-size:21px;
+ line-height:2;
+ direction:rtl;
+ color:#ead9e3;
+}
+
+@media(min-width:800px){
+ #controls button{width:65px;height:65px}
 }
 </style>
 </head>
+
 <body>
 
-<div id="startScreen">
- <div class="startbox">
-  <div style="font-size:48px">🌙</div>
-  <h1>FIND YOUR LIAM</h1>
-  <div class="sub">A JOURNEY MADE JUST FOR YOU</div>
-  <p style="font-size:10px;line-height:2.5;color:#d6c6df">
-   Five little worlds.<br>
-   One person worth finding.
+<div id="game"></div>
+
+<div id="start">
+ <div class="start-content">
+  <div class="small-title">A STORY MADE FOR YOU</div>
+  <h1>FIND ME</h1>
+  <div class="subtitle">YURAM ♡ LIAM</div>
+  <div class="start-note">
+   Some people are worth every step.<br>
+   Some stories are worth finding.
+  </div>
+  <button id="startButton">BEGIN JOURNEY</button>
+  <p style="font-size:12px;color:#bda9bc;margin-top:25px">
+   HEADPHONES RECOMMENDED
   </p>
-  <button onclick="startGame()">START JOURNEY</button>
  </div>
 </div>
 
-<div id="game">
- <h1>FIND YOUR LIAM</h1>
- <div class="info">
-  <span id="stageName">THE BEGINNING</span>
-  <span id="stars">STARS: 0 / 3</span>
- </div>
+<div id="hud">
+ <div id="stage">THE BEGINNING</div>
+ <div id="objective">Find the memories</div>
+ <div id="counter">♡ 0 / 3</div>
+</div>
 
- <canvas id="screen" width="640" height="400"></canvas>
+<div id="musicLabel">♫ SOFT PIANO</div>
 
- <div class="sub" id="hint">
-  COLLECT 3 STARS AND FIND THE DOOR
- </div>
+<div id="controls">
+ <button data-dir="left">◀</button>
+ <button data-dir="back">▼</button>
+ <button data-dir="forward">▲</button>
+ <button data-dir="right">▶</button>
+</div>
 
- <div id="controls">
-  <span></span>
-  <button onpointerdown="move(0,-1)">▲</button>
-  <span></span>
-  <button onpointerdown="move(-1,0)">◀</button>
-  <button onpointerdown="move(0,1)">▼</button>
-  <button onpointerdown="move(1,0)">▶</button>
- </div>
+<button id="interact">OPEN</button>
 
- <div class="sub">USE ARROW KEYS OR WASD TOO</div>
- <div id="ending">
-  <h2 style="color:#f5c9df">YOU FOUND YOUR LIAM</h2>
+<div id="dialogue">
+ <div class="dialogue-box">
+  <div class="chapter">A MEMORY FOR YOU</div>
+  <h2 id="dialogueTitle">The Beginning</h2>
+  <p id="dialogueText"></p>
+  <button id="continueButton">CONTINUE ♡</button>
  </div>
 </div>
 
-<div id="modal">
- <div class="paper">
-  <div style="font-size:30px">✉</div>
-  <h2 id="letterTitle">A LITTLE MESSAGE</h2>
-  <p id="letterText"></p>
-  <button onclick="nextStage()">CONTINUE ♥</button>
+<div id="ending">
+ <div>
+  <div style="font-size:50px">♡</div>
+  <h2>YOU FOUND ME</h2>
+  <p>
+   بین تمام مسیرهایی که می‌شد رفت،<br>
+   من باز هم تو رو انتخاب می‌کردم.<br>
+   <br>
+   Happy Anniversary, Yuram.
+  </p>
+  <button onclick="location.reload()">PLAY AGAIN</button>
  </div>
 </div>
 
-<script>
-const canvas=document.getElementById("screen");
-const ctx=canvas.getContext("2d");
-ctx.imageSmoothingEnabled=false;
+<script type="importmap">
+{
+ "imports":{
+  "three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+ }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+
+/* --------------------------------
+   BASIC SETUP
+-------------------------------- */
+
+const container=document.getElementById('game');
+
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x293345);
+scene.fog=new THREE.FogExp2(0x293345,0.018);
+
+const camera=new THREE.PerspectiveCamera(
+ 60,window.innerWidth/window.innerHeight,0.1,150
+);
+
+camera.position.set(0,5,9);
+
+const renderer=new THREE.WebGLRenderer({
+ antialias:true,
+ powerPreference:'high-performance'
+});
+
+renderer.setSize(window.innerWidth,window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,1.7));
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.2;
+
+container.appendChild(renderer.domElement);
+
+/* --------------------------------
+   LIGHTS
+-------------------------------- */
+
+const ambient=new THREE.HemisphereLight(
+ 0xe8d8e8,0x4b4654,2.1
+);
+scene.add(ambient);
+
+const moon=new THREE.DirectionalLight(0xffd9df,2.5);
+moon.position.set(-5,10,5);
+moon.castShadow=true;
+moon.shadow.mapSize.set(1024,1024);
+scene.add(moon);
+
+/* --------------------------------
+   MATERIAL HELPERS
+-------------------------------- */
+
+function material(color,roughness=0.85){
+ return new THREE.MeshStandardMaterial({
+  color,
+  roughness
+ });
+}
+
+function sphere(parent,x,y,z,sx,sy,sz,color){
+ const mesh=new THREE.Mesh(
+  new THREE.SphereGeometry(1,20,16),
+  material(color)
+ );
+ mesh.position.set(x,y,z);
+ mesh.scale.set(sx,sy,sz);
+ mesh.castShadow=true;
+ mesh.receiveShadow=true;
+ parent.add(mesh);
+ return mesh;
+}
+
+function box(parent,x,y,z,sx,sy,sz,color){
+ const mesh=new THREE.Mesh(
+  new THREE.BoxGeometry(sx,sy,sz),
+  material(color)
+ );
+ mesh.position.set(x,y,z);
+ mesh.castShadow=true;
+ mesh.receiveShadow=true;
+ parent.add(mesh);
+ return mesh;
+}
+
+function cylinder(parent,x,y,z,r1,r2,h,color){
+ const mesh=new THREE.Mesh(
+  new THREE.CylinderGeometry(r1,r2,h,16),
+  material(color)
+ );
+ mesh.position.set(x,y,z);
+ mesh.castShadow=true;
+ parent.add(mesh);
+ return mesh;
+}
+
+/* --------------------------------
+   CHARACTER CREATION
+-------------------------------- */
+
+function createCharacter(type){
+ const group=new THREE.Group();
+
+ const yuram=type==='yuram';
+
+ const skin=0xe8bca8;
+ const hair=yuram?0x21191c:0x25171d;
+ const clothes=yuram?0x17171b:0xe8d8c9;
+ const pants=yuram?0x17171b:0x49323c;
+
+ // Legs
+ const leg1=box(group,-0.17,0.55,0,0.22,0.75,0.25,pants);
+ const leg2=box(group,0.17,0.55,0,0.22,0.75,0.25,pants);
+
+ // Shoes
+ box(group,-0.17,0.17,0.08,0.25,0.15,0.38,0x30242c);
+ box(group,0.17,0.17,0.08,0.25,0.15,0.38,0x30242c);
+
+ // Body
+ const torso=sphere(group,0,1.35,0,0.43,0.62,0.27,clothes);
+
+ // Arms
+ const arm1=box(group,-0.49,1.35,0,0.17,0.7,0.18,clothes);
+ const arm2=box(group,0.49,1.35,0,0.17,0.7,0.18,clothes);
+
+ // Neck
+ cylinder(group,0,1.88,0,0.12,0.13,0.2,skin);
+
+ // Head
+ sphere(group,0,2.23,0,0.39,0.47,0.34,skin);
+
+ // Hair cap
+ sphere(group,0,2.53,-0.04,0.43,0.29,0.39,hair);
+
+ // Front hair strands
+ for(let i=0;i<5;i++){
+  const strand=box(
+   group,-0.29+i*0.14,2.43,0.29,
+   0.12,0.33,0.13,hair
+  );
+  strand.rotation.z=(i-2)*0.14;
+ }
+
+ // Side hair
+ sphere(group,-0.37,2.29,-0.02,0.12,0.34,0.23,hair);
+ sphere(group,0.37,2.29,-0.02,0.12,0.34,0.23,hair);
+
+ // Face
+ sphere(group,-0.14,2.25,0.31,0.035,0.045,0.025,0x30232b);
+ sphere(group,0.14,2.25,0.31,0.035,0.045,0.025,0x30232b);
+
+ // Nose
+ sphere(group,0,2.15,0.34,0.045,0.045,0.035,0xd69e91);
+
+ if(yuram){
+  // Round glasses
+  const glassesMat=new THREE.MeshStandardMaterial({
+   color:0x342a2c,metalness:0.65,roughness:0.3
+  });
+
+  for(const side of [-1,1]){
+   const ring=new THREE.Mesh(
+    new THREE.TorusGeometry(0.115,0.012,8,24),
+    glassesMat
+   );
+   ring.position.set(side*0.14,2.26,0.35);
+   group.add(ring);
+  }
+
+  box(group,0,2.26,0.36,0.09,0.018,0.02,0x342a2c);
+
+  // Black belt
+  box(group,0,1.04,0.28,0.55,0.07,0.05,0x252126);
+
+ }else{
+  // Long hair behind the body
+  sphere(group,0,1.9,-0.22,0.46,0.9,0.23,hair);
+  sphere(group,-0.35,1.9,-0.08,0.13,0.8,0.2,hair);
+  sphere(group,0.35,1.9,-0.08,0.13,0.8,0.2,hair);
+
+  // Hair clip
+  box(group,0.28,2.48,0.32,0.15,0.045,0.04,0xd9a8b7);
+
+  // Skirt
+  cylinder(group,0,0.95,0,0.4,0.25,0.35,0x49323c);
+ }
+
+ group.userData={
+  legs:[leg1,leg2],
+  arms:[arm1,arm2],
+  type
+ };
+
+ return group;
+}
+
+const player=createCharacter('yuram');
+scene.add(player);
+
+const liam=createCharacter('liam');
+liam.visible=false;
+scene.add(liam);
+
+/* --------------------------------
+   STAGE DATA
+-------------------------------- */
 
 const stages=[
  {
-  name:"THE BEGINNING",
-  bg:"#253d45",ground:"#45645b",decor:"#79947a",
-  title:"THE BEGINNING",
-  text:"یادته از کجا شروع شدیم؟ شاید اون موقع هیچ‌کدوممون نمی‌دونستیم قراره این‌قدر برای هم مهم بشیم. ولی حالا تو یکی از قشنگ‌ترین قسمت‌های زندگی منی."
+  name:'THE BEGINNING',
+  subtitle:'A quiet beginning',
+  sky:0x3b3a52,
+  ground:0x52604e,
+  accent:0xd9a8b7,
+  text:'یادته از کجا شروع شدیم؟ شاید اون موقع هیچ‌کدوممون نمی‌دونستیم قراره این‌قدر برای هم مهم بشیم. ولی حالا تو یکی از قشنگ‌ترین قسمت‌های زندگی منی.'
  },
  {
-  name:"EVEN FROM AFAR",
-  bg:"#26334e",ground:"#394c6d",decor:"#8195b8",
-  title:"EVEN FROM AFAR",
-  text:"حتی وقتی فاصله بینمونه، یه جوری توی فکرمی که انگار همین نزدیکی. فاصله هیچ‌وقت باعث نشده کمتر بخوامت."
+  name:'EVEN FROM AFAR',
+  subtitle:'Even from afar',
+  sky:0x28364d,
+  ground:0x3e4a60,
+  accent:0x9db7d2,
+  text:'حتی وقتی فاصله بینمونه، یه جوری توی فکرمی که انگار همین نزدیکی. فاصله هیچ‌وقت باعث نشده کمتر بخوامت.'
  },
  {
-  name:"THE LITTLE THINGS",
-  bg:"#4a354b",ground:"#76536b",decor:"#d29ab5",
-  title:"THE LITTLE THINGS",
-  text:"می‌دونی؟ بعضی از چیزای کوچیکت برای من خیلی بزرگن. صدات، اخلاق خاصت، اون سرد بودنای گاه‌به‌گاهت و حتی همون چیزایی که شاید خودت حواست بهشون نباشه."
+  name:'THE LITTLE THINGS',
+  subtitle:'The little things',
+  sky:0x51404e,
+  ground:0x6c5261,
+  accent:0xe6bdce,
+  text:'صدات، اخلاق خاصت، اون سرد بودنای گاه‌به‌گاهت و حتی چیزایی که شاید خودت حواست بهشون نباشه، برای من دوست‌داشتنی‌ان.'
  },
  {
-  name:"ALL THE UNSAID",
-  bg:"#282744",ground:"#51446b",decor:"#a99acb",
-  title:"ALL THE UNSAID",
-  text:"همه چیزایی که همیشه به زبون نمیارم، به این معنی نیست که حسشون نمی‌کنم. خیلی حرفا توی دلمه که شاید نتونم درست بیانشون کنم، ولی توی وجودم جا دارن."
+  name:'ALL THE UNSAID',
+  subtitle:'All the unsaid',
+  sky:0x302a48,
+  ground:0x50466a,
+  accent:0xbba9db,
+  text:'همه چیزایی که همیشه به زبون نمیارم، به این معنی نیست که حسشون نمی‌کنم. خیلی حرفا توی دلمه که شاید نتونم درست بیانشون کنم، ولی توی وجودم جا دارن.'
  },
  {
-  name:"I FOUND YOU",
-  bg:"#25364d",ground:"#45647b",decor:"#f4c8df",
-  title:"I FOUND YOU",
-  text:"و بالاخره رسیدیم به اینجا. بین تمام مسیرها و اتفاقا، انتخاب من هنوز هم تویی. این بازی فقط یه بهونه بود که بهت بگم چقدر بودنت برام ارزش داره. ماهگردمون مبارک، یورام. ♥"
+  name:'I FOUND YOU',
+  subtitle:'I found you',
+  sky:0x39465c,
+  ground:0x596b70,
+  accent:0xf0c4d6,
+  text:'و بالاخره رسیدیم به اینجا. بین تمام مسیرها و اتفاقا، انتخاب من هنوز هم تویی. ماهگردمون مبارک، یورام. ♥'
  }
 ];
 
-let level=0;
-let player={x:70,y:70};
-let stars=[];
+let currentStage=0;
 let collected=0;
-let door={x:570,y:320};
-let paused=false;
-let ended=false;
+let collectibles=[];
+let gate;
+let paused=true;
+let finished=false;
 
-function makeStars(){
- stars=[
-  {x:190,y:100,got:false},
-  {x:430,y:90,got:false},
-  {x:320,y:285,got:false}
+/* --------------------------------
+   ENVIRONMENT
+-------------------------------- */
+
+function clearWorld(){
+ while(scene.children.length>0){
+  const child=scene.children[0];
+  scene.remove(child);
+ }
+ scene.add(ambient,moon,player,liam);
+}
+
+function tree(x,z,scale=1){
+ const group=new THREE.Group();
+
+ cylinder(
+  group,0,0.8,0,0.15,0.2,1.6,0x51403b
+ );
+
+ sphere(
+  group,0,2,z*0,0.85,1.1,0.85,0x354a43
+ );
+
+ sphere(
+  group,-0.45,2.4,0,0.65,0.8,0.7,0x41574b
+ );
+
+ sphere(
+  group,0.45,2.5,0,0.7,0.8,0.7,0x4a6150
+ );
+
+ group.position.set(x,0,z);
+ group.scale.setScalar(scale);
+ scene.add(group);
+}
+
+function flower(x,z,color){
+ const group=new THREE.Group();
+
+ sphere(group,0,0.2,0,0.08,0.08,0.08,color);
+ cylinder(group,0,0,0,0.018,0.02,0.25,0x71875c);
+
+ group.position.set(x,0,z);
+ scene.add(group);
+}
+
+function buildWorld(){
+ clearWorld();
+
+ const s=stages[currentStage];
+
+ scene.background.setHex(s.sky);
+ scene.fog.color.setHex(s.sky);
+
+ // Ground
+ const ground=new THREE.Mesh(
+  new THREE.PlaneGeometry(100,100),
+  material(s.ground)
+ );
+ ground.rotation.x=-Math.PI/2;
+ ground.receiveShadow=true;
+ scene.add(ground);
+
+ // Path
+ const path=new THREE.Mesh(
+  new THREE.PlaneGeometry(7,70),
+  material(0x887b77)
+ );
+ path.rotation.x=-Math.PI/2;
+ path.position.set(0,0.02,-12);
+ scene.add(path);
+
+ // Distant trees
+ for(let i=0;i<35;i++){
+  const side=i%2===0?-1:1;
+  const z=-30+(i*3.7);
+  const x=side*(7+Math.sin(i*2)*3);
+  tree(x,z,0.7+(i%3)*0.2);
+ }
+
+ // Flowers beside path
+ for(let i=0;i<55;i++){
+  const side=i%2===0?-1:1;
+  flower(
+   side*(4+Math.random()*2),
+   -32+Math.random()*55,
+   s.accent
+  );
+ }
+
+ // Decorative lamps
+ for(let i=0;i<7;i++){
+  const x=i%2===0?-4:4;
+  const z=-28+i*8;
+
+  cylinder(scene,x,1.3,z,0.07,0.08,2.6,0x34313a);
+
+  const light=new THREE.PointLight(
+   s.accent,1.5,9
+  );
+  light.position.set(x,2.7,z);
+  scene.add(light);
+
+  sphere(scene,x,2.7,z,0.12,0.12,0.12,0xffd8c5);
+ }
+
+ // Stars / collectibles
+ collectibles=[];
+
+ const positions=[
+  [-2,0,-9],
+  [2,0,-20],
+  [-1,0,-30]
  ];
+
+ positions.forEach(pos=>{
+  const gem=new THREE.Mesh(
+   new THREE.OctahedronGeometry(0.38),
+   new THREE.MeshStandardMaterial({
+    color:s.accent,
+    emissive:s.accent,
+    emissiveIntensity:1.2,
+    metalness:0.25,
+    roughness:0.25
+   })
+  );
+
+  gem.position.set(pos[0],1.3,pos[2]);
+  gem.userData.baseY=1.3;
+  scene.add(gem);
+  collectibles.push(gem);
+
+  const light=new THREE.PointLight(s.accent,1,4);
+  light.position.copy(gem.position);
+  scene.add(light);
+ });
+
+ // Gate
+ gate=new THREE.Group();
+
+ const gateMat=material(0x382a3a);
+ const post1=box(gate,-1.3,1.6,0,0.25,3.2,0.3,0x604354);
+ const post2=box(gate,1.3,1.6,0,0.25,3.2,0.3,0x604354);
+ const top=box(gate,0,3.1,0,2.8,0.25,0.3,0x604354);
+
+ const glow=new THREE.PointLight(s.accent,2.5,12);
+ glow.position.set(0,2,0);
+ gate.add(glow);
+
+ gate.position.set(0,0,-39);
+ scene.add(gate);
+
+ // Small glowing moon
+ const moonBall=sphere(
+  scene,12,15,-35,2,2,2,0xf1d6d9
+ );
+ moonBall.material.emissive=new THREE.Color(0x8d7b92);
+ moonBall.material.emissiveIntensity=0.3;
+
+ player.position.set(0,0,3);
+ player.rotation.y=0;
+
+ liam.visible=false;
+ if(currentStage===4){
+  liam.position.set(0,0,-36);
+  liam.visible=true;
+ }
+
  collected=0;
- player={x:70,y:70};
- paused=false;
- document.getElementById("stars").innerText="STARS: 0 / 3";
- document.getElementById("stageName").innerText=stages[level].name;
- document.getElementById("hint").innerText=
- "COLLECT 3 STARS AND FIND THE DOOR";
+ updateHUD();
 }
 
-function startGame(){
- document.getElementById("startScreen").style.display="none";
- makeStars();
- draw();
-}
+/* --------------------------------
+   MOVEMENT
+-------------------------------- */
 
-function rect(x,y,w,h,color){
- ctx.fillStyle=color;
- ctx.fillRect(x,y,w,h);
-}
+const keys={
+ forward:false,
+ back:false,
+ left:false,
+ right:false
+};
 
-function drawCharacter(x,y,isLiam=false){
- // Pixel-art character base
- const hair=isLiam?"#241a28":"#171820";
- const clothes=isLiam?"#e8d4bf":"#17171c";
- // shadow
- rect(x-10,y+17,22,5,"#17202a");
- // legs
- rect(x-7,y+9,5,10,"#292535");
- rect(x+3,y+9,5,10,"#292535");
- // body
- rect(x-10,y-5,21,16,clothes);
- // arms
- rect(x-14,y-3,5,13,clothes);
- rect(x+10,y-3,5,13,clothes);
- // face
- rect(x-9,y-22,19,18,"#edc4a9");
- // hair
- rect(x-11,y-25,23,8,hair);
- rect(x-12,y-20,5,12,hair);
- rect(x+7,y-20,5,9,hair);
- if(isLiam){
-  // long wavy hair
-  rect(x-13,y-19,4,22,hair);
-  rect(x+10,y-18,4,20,hair);
-  rect(x-10,y-27,19,4,hair);
-  // hair clips
-  rect(x+5,y-25,5,3,"#e8a6ca");
+const moveDirection=new THREE.Vector3();
+
+function updatePlayer(delta){
+ if(paused||finished)return;
+
+ moveDirection.set(0,0,0);
+
+ if(keys.forward)moveDirection.z-=1;
+ if(keys.back)moveDirection.z+=1;
+ if(keys.left)moveDirection.x-=1;
+ if(keys.right)moveDirection.x+=1;
+
+ if(moveDirection.length()>0){
+  moveDirection.normalize();
+
+  player.position.x+=moveDirection.x*delta*4.2;
+  player.position.z+=moveDirection.z*delta*4.2;
+
+  player.position.x=THREE.MathUtils.clamp(
+   player.position.x,-3.5,3.5
+  );
+
+  player.position.z=THREE.MathUtils.clamp(
+   player.position.z,-38,5
+  );
+
+  const angle=Math.atan2(
+   moveDirection.x,moveDirection.z
+  );
+
+  player.rotation.y=THREE.MathUtils.lerp(
+   player.rotation.y,angle,0.15
+  );
+
+  const t=performance.now()*0.012;
+  const swing=Math.sin(t)*0.45;
+
+  player.userData.legs[0].rotation.x=swing;
+  player.userData.legs[1].rotation.x=-swing;
+  player.userData.arms[0].rotation.x=-swing*0.5;
+  player.userData.arms[1].rotation.x=swing*0.5;
+
  }else{
-  // short hair and glasses
-  rect(x-13,y-19,5,10,hair);
-  rect(x+9,y-19,5,9,hair);
-  rect(x-10,y-28,20,5,hair);
-  // glasses
-  rect(x-8,y-16,7,5,"#25232d");
-  rect(x+2,y-16,7,5,"#25232d");
-  rect(x-1,y-14,4,2,"#25232d");
+  player.userData.legs.forEach(x=>x.rotation.x=0);
+  player.userData.arms.forEach(x=>x.rotation.x=0);
  }
- // eyes
- rect(x-5,y-15,2,2,"#28202b");
- rect(x+4,y-15,2,2,"#28202b");
+
+ // Camera follows behind player
+ const offset=new THREE.Vector3(0,4.5,8);
+ offset.applyAxisAngle(
+  new THREE.Vector3(0,1,0),
+  player.rotation.y
+ );
+
+ const targetCamera=player.position.clone().add(offset);
+
+ camera.position.lerp(targetCamera,delta*3);
+ camera.lookAt(
+  player.position.x,
+  player.position.y+1.5,
+  player.position.z-1
+ );
+
+ checkCollectibles();
+ checkGate();
 }
 
-function draw(){
- if(ended)return;
- const s=stages[level];
- rect(0,0,640,400,s.bg);
- rect(20,20,600,360,s.ground);
+/* --------------------------------
+   COLLECTING OBJECTS
+-------------------------------- */
 
- // pixel landscape decorations
- for(let i=0;i<18;i++){
-  let x=(i*83+25)%610+10;
-  let y=(i*57+35)%360+20;
-  rect(x,y,12,12,s.decor);
-  rect(x+4,y+12,4,8,"#263d3b");
- }
- // path
- rect(45,45,550,310,"#ffffff0b");
- rect(45,45,550,3,"#ffffff18");
- rect(45,352,550,3,"#ffffff18");
+function checkCollectibles(){
+ collectibles.forEach((gem)=>{
+  if(!gem.visible)return;
 
- // stars
- stars.forEach(st=>{
-  if(!st.got){
-   ctx.fillStyle="#ffe89a";
-   ctx.font="25px serif";
-   ctx.fillText("★",st.x-10,st.y+8);
-  }
- });
+  const distance=player.position.distanceTo(gem.position);
 
- // door
- rect(door.x-15,door.y-24,30,42,collected===3?"#f2b7d2":"#27303f");
- rect(door.x-10,door.y-19,20,37,collected===3?"#f6d5e5":"#485366");
- rect(door.x+5,door.y-2,3,3,"#ffe49a");
-
- drawCharacter(player.x,player.y,false);
- if(level===4){
-  drawCharacter(570,250,true);
- }
-
- requestAnimationFrame(draw);
-}
-
-function move(dx,dy){
- if(paused||ended)return;
- let nx=player.x+dx*12;
- let ny=player.y+dy*12;
- player.x=Math.max(35,Math.min(605,nx));
- player.y=Math.max(45,Math.min(350,ny));
-
- stars.forEach(st=>{
-  if(!st.got && Math.abs(player.x-st.x)<20 &&
-     Math.abs(player.y-st.y)<20){
-   st.got=true;
+  if(distance<1.5){
+   gem.visible=false;
    collected++;
-   document.getElementById("stars").innerText=
-    "STARS: "+collected+" / 3";
+   updateHUD();
   }
  });
+}
 
- if(collected===3 &&
-    Math.abs(player.x-door.x)<28 &&
-    Math.abs(player.y-door.y)<28){
-   openLetter();
+function checkGate(){
+ const distance=player.position.distanceTo(
+  new THREE.Vector3(0,0,-39)
+ );
+
+ if(distance<2.5){
+  if(collected>=3){
+   openMessage();
+  }else{
+   document.getElementById('objective').innerText=
+    'Collect all 3 memories first';
+  }
  }
 }
 
-document.addEventListener("keydown",e=>{
- const k=e.key.toLowerCase();
- if(k==="arrowup"||k==="w")move(0,-1);
- if(k==="arrowdown"||k==="s")move(0,1);
- if(k==="arrowleft"||k==="a")move(-1,0);
- if(k==="arrowright"||k==="d")move(1,0);
+function updateHUD(){
+ document.getElementById('stage').innerText=
+  stages[currentStage].name;
+
+ document.getElementById('counter').innerText=
+  '♡ '+collected+' / 3';
+
+ document.getElementById('objective').innerText=
+  'Find the glowing memories';
+}
+
+/* --------------------------------
+   STORY
+-------------------------------- */
+
+function openMessage(){
+ paused=true;
+
+ document.getElementById('dialogueTitle').innerText=
+  stages[currentStage].subtitle;
+
+ document.getElementById('dialogueText').innerText=
+  stages[currentStage].text;
+
+ document.getElementById('dialogue').style.display='flex';
+}
+
+document.getElementById('continueButton').onclick=()=>{
+ document.getElementById('dialogue').style.display='none';
+
+ if(currentStage<4){
+  currentStage++;
+  buildWorld();
+  paused=false;
+ }else{
+  finished=true;
+  document.getElementById('ending').style.display='flex';
+ }
+};
+
+/* --------------------------------
+   TOUCH CONTROLS
+-------------------------------- */
+
+document.querySelectorAll('#controls button').forEach(button=>{
+ const direction=button.dataset.dir;
+
+ const start=event=>{
+  event.preventDefault();
+  keys[direction]=true;
+ };
+
+ const stop=event=>{
+  event.preventDefault();
+  keys[direction]=false;
+ };
+
+ button.addEventListener('pointerdown',start);
+ button.addEventListener('pointerup',stop);
+ button.addEventListener('pointerleave',stop);
+ button.addEventListener('pointercancel',stop);
 });
 
-function openLetter(){
- paused=true;
- document.getElementById("letterTitle").innerText=stages[level].title;
- document.getElementById("letterText").innerText=stages[level].text;
- document.getElementById("modal").style.display="flex";
+window.addEventListener('keydown',e=>{
+ const k=e.key.toLowerCase();
+
+ if(k==='w'||k==='arrowup')keys.forward=true;
+ if(k==='s'||k==='arrowdown')keys.back=true;
+ if(k==='a'||k==='arrowleft')keys.left=true;
+ if(k==='d'||k==='arrowright')keys.right=true;
+});
+
+window.addEventListener('keyup',e=>{
+ const k=e.key.toLowerCase();
+
+ if(k==='w'||k==='arrowup')keys.forward=false;
+ if(k==='s'||k==='arrowdown')keys.back=false;
+ if(k==='a'||k==='arrowleft')keys.left=false;
+ if(k==='d'||k==='arrowright')keys.right=false;
+});
+
+/* --------------------------------
+   ORIGINAL AMBIENT MUSIC
+-------------------------------- */
+
+let audioContext;
+let musicTimer;
+let musicStep=0;
+
+function startMusic(){
+ if(audioContext)return;
+
+ audioContext=new (
+  window.AudioContext||window.webkitAudioContext
+ )();
+
+ const notes=[
+  [261.63,329.63,392.00],
+  [220.00,261.63,329.63],
+  [174.61,220.00,261.63],
+  [196.00,246.94,293.66]
+ ];
+
+ function playNote(){
+  if(!audioContext)return;
+
+  const chord=notes[Math.floor(musicStep/4)%notes.length];
+  const frequency=chord[musicStep%3];
+
+  const oscillator=audioContext.createOscillator();
+  const gain=audioContext.createGain();
+
+  oscillator.type='sine';
+  oscillator.frequency.value=frequency;
+
+  gain.gain.setValueAtTime(
+   0.0001,audioContext.currentTime
+  );
+
+  gain.gain.exponentialRampToValueAtTime(
+   0.045,audioContext.currentTime+0.12
+  );
+
+  gain.gain.exponentialRampToValueAtTime(
+   0.0001,audioContext.currentTime+2.2
+  );
+
+  oscillator.connect(gain);
+  gain.connect(audioContext.destination);
+
+  oscillator.start();
+  oscillator.stop(audioContext.currentTime+2.3);
+
+  musicStep++;
+ }
+
+ playNote();
+ musicTimer=setInterval(playNote,850);
 }
 
-function nextStage(){
- document.getElementById("modal").style.display="none";
- if(level<4){
-  level++;
-  makeStars();
- }else{
-  ended=true;
-  document.getElementById("ending").style.display="block";
-  document.getElementById("hint").innerText="THE END ♥";
-  document.getElementById("controls").style.display="none";
-  document.getElementById("stageName").innerText="TOGETHER";
-  drawEnding();
+/* --------------------------------
+   START GAME
+-------------------------------- */
+
+document.getElementById('startButton').onclick=async()=>{
+ startMusic();
+
+ if(audioContext && audioContext.state==='suspended'){
+  await audioContext.resume();
  }
+
+ document.getElementById('start').style.display='none';
+ document.getElementById('hud').style.display='block';
+ document.getElementById('controls').style.display='flex';
+ document.getElementById('interact').style.display='block';
+ document.getElementById('musicLabel').style.display='block';
+
+ buildWorld();
+ paused=false;
+};
+
+/* --------------------------------
+   RENDER LOOP
+-------------------------------- */
+
+const clock=new THREE.Clock();
+
+function animate(){
+ requestAnimationFrame(animate);
+
+ const delta=Math.min(clock.getDelta(),0.05);
+
+ if(!paused&&!finished){
+  updatePlayer(delta);
+
+  collectibles.forEach((gem,i)=>{
+   if(gem.visible){
+    gem.position.y=gem.userData.baseY+
+     Math.sin(performance.now()*0.002+i)*0.16;
+    gem.rotation.y+=delta;
+   }
+  });
+ }
+
+ renderer.render(scene,camera);
 }
 
-function drawEnding(){
- rect(0,0,640,400,"#19243c");
- for(let i=0;i<70;i++){
-  let x=(i*97)%640;
-  let y=(i*53)%400;
-  rect(x,y,3,3,"#ffe8b0");
- }
- drawCharacter(285,230,false);
- drawCharacter(355,230,true);
- ctx.fillStyle="#f6cce1";
- ctx.font="22px serif";
- ctx.fillText("♥",310,170);
-}
+animate();
+
+/* --------------------------------
+   RESIZE
+-------------------------------- */
+
+window.addEventListener('resize',()=>{
+ camera.aspect=window.innerWidth/window.innerHeight;
+ camera.updateProjectionMatrix();
+ renderer.setSize(window.innerWidth,window.innerHeight);
+});
 </script>
+
 </body>
 </html>
